@@ -8,15 +8,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(OpenCV REQUIRED)
 
-add_executable(ball_tracker)
-target_sources(ball_tracker PRIVATE
+add_executable(ball_dectector)
+target_sources(ball_dectector PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/cmdline.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/img_proc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
 
-target_include_directories(ball_tracker PRIVATE
+target_include_directories(ball_dectector PRIVATE
     ${OpenCV_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
