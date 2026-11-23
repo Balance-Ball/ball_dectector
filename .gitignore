@@ -1,0 +1,5 @@
+.cache/
+build/
+config/
+.clangd
+compile_commands.json
