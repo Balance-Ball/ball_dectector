@@ -13,6 +13,8 @@
 
 ```bash
 # Build with cmake in console
+git clone https://github.com/Balance-Ball/ball_dectector.git
+cd ball_dectector
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
