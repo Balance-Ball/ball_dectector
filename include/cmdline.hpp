@@ -4,6 +4,7 @@
 
 namespace ball_tracker {
     struct CmdOptions {
+        bool help = false;
         std::string source = "";
     };
 

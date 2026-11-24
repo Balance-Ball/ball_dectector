@@ -76,7 +76,15 @@ namespace ball_tracker {
         return result;
     }
 
-    auto proc_frame(const cv::Mat input, cv::Mat& output, const Config& cfg) -> void {
-        
+    auto proc_frame(const cv::Mat raw_frame, const Config& proc_cfg) -> std::optional<std::vector<DetectResult>> {
+        auto proc_frame = cv::Mat();
+        cv::cvtColor(raw_frame, proc_frame, cv::COLOR_BGR2HSV);
+
+        auto binary = cv::Mat();
+        ball_tracker::binary(proc_frame, binary, proc_cfg);
+        auto cleaned = cv::Mat();
+        ball_tracker::clean(binary, cleaned, proc_cfg);
+
+        return ball_tracker::detect_balls(cleaned, proc_cfg);
     }
 }

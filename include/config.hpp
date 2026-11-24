@@ -10,6 +10,7 @@ namespace ball_tracker {
         std::array<uint16_t, 3> filter_end   = {};
 
         // Optional options
+        std::array<uint16_t, 2> resolution = {};
         uint8_t video_dev_index = 0;
 
         uint8_t open_kernal_size  = 0u;

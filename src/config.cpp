@@ -1,10 +1,12 @@
 #include "config.hpp"
 #include "nlohmann_json.hpp"
+#include <array>
 #include <cstdint>
 #include <fstream>
 #include <stdexcept>
 
 namespace {
+    constexpr std::array<uint16_t, 2> DEFAULT_FRAME_PROC_RESOLUTION = {640, 480};
     constexpr uint8_t DEFAULT_VIDEO_DEVICE_INDEX = 0;
 
     constexpr uint8_t DEFAULT_OPEN_KERNAL_SIZE  = 3;
@@ -29,6 +31,7 @@ namespace ball_tracker {
         json.at("hsv_end").get_to(result.filter_end);
 
         // Optional options
+        result.resolution = json.value<std::array<uint16_t, 2>>("resolution", DEFAULT_FRAME_PROC_RESOLUTION);
         result.video_dev_index = json.value<uint8_t>("video_dev_index", DEFAULT_VIDEO_DEVICE_INDEX);
 
         result.open_kernal_size  = json.value<uint8_t>("open_kernal_size", DEFAULT_OPEN_KERNAL_SIZE);
