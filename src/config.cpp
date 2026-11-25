@@ -27,8 +27,10 @@ namespace ball_tracker {
         auto result = Config();
 
         // Required options
-        json.at("hsv_begin").get_to(result.filter_begin);
-        json.at("hsv_end").get_to(result.filter_end);
+        json.at("ball_hsv_begin").get_to(result.ball_hsv_begin);
+        json.at("ball_hsv_end")  .get_to(result.ball_hsv_end);
+        json.at("bg_hsv_begin").get_to(result.bg_hsv_begin);
+        json.at("bg_hsv_end")  .get_to(result.bg_hsv_end);
 
         // Optional options
         result.resolution = json.value<std::array<uint16_t, 2>>("resolution", DEFAULT_FRAME_PROC_RESOLUTION);

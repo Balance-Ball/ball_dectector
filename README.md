@@ -31,8 +31,11 @@ ball_detector --help
 
 ```jsonc
 {
-    "hsv_begin": [20, 60, 100],
-    "hsv_end":   [40, 90, 255],
+    // Required options
+    "ball_hsv_begin": [20, 60, 100],
+    "ball_hsv_end":   [40, 90, 255],
+    "bg_hsv_begin": [0, 0, 0],
+    "bg_hsv_end": [255, 255, 255],
 
     // optional config fields(All of them are default in this example json configration)
     "resolution": [640, 480],

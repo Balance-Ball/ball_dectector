@@ -6,8 +6,10 @@
 
 namespace ball_tracker {
     struct Config {
-        std::array<uint16_t, 3> filter_begin = {};
-        std::array<uint16_t, 3> filter_end   = {};
+        std::array<uint16_t, 3> ball_hsv_begin = {};
+        std::array<uint16_t, 3> ball_hsv_end   = {};
+        std::array<uint16_t, 3> bg_hsv_begin = {};
+        std::array<uint16_t, 3> bg_hsv_end   = {};
 
         // Optional options
         std::array<uint16_t, 2> resolution = {};
