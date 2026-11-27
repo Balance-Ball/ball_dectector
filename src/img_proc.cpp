@@ -1,7 +1,12 @@
 #include "img_proc.hpp"
 #include "config.hpp"
+#include <opencv2/core/hal/interface.h>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/core/types.hpp>
 #include <opencv2/geometry.hpp>
+#include <opencv2/geometry/2d.hpp>
 #include <opencv2/opencv.hpp>
+#include <utility>
 #include <vector>
 #include <cmath>
 #include <optional>
@@ -14,13 +19,23 @@ namespace {
 
         std::vector<cv::Point> points;
     };
+
+    static auto preproc(const cv::Mat input, cv::Mat& output, const ball_tracker::BinaryRange bin_range, ball_tracker::Config cfg) -> void {
+        auto binary = cv::Mat();
+        auto cleaned = cv::Mat();
+        
+        ball_tracker::binary(input, binary, bin_range);
+        ball_tracker::clean(binary, cleaned, cfg);
+
+        output = cleaned;
+    }
 }
 
 namespace ball_tracker {
-    auto binary(const cv::Mat input, cv::Mat& output, const Config& cfg) -> void {
+    auto binary(const cv::Mat input, cv::Mat& output, BinaryRange range) -> void {
         auto gaus = cv::Mat();
         cv::GaussianBlur(input, gaus, cv::Size(3, 3), 5);
-        cv::inRange(gaus, cfg.filter_begin, cfg.filter_end, output);
+        cv::inRange(gaus, range.first, range.second, output);
     }
 
     auto clean(const cv::Mat input, cv::Mat& output, const Config& cfg) -> void {
@@ -33,9 +48,12 @@ namespace ball_tracker {
         cv::morphologyEx(opened, output, cv::MORPH_CLOSE, closed_kernal);
     }
 
-    auto detect_balls(const cv::Mat input, const Config& cfg) -> std::optional<std::vector<DetectResult>> {
+    auto detect_balls(const cv::Mat input, const Config& cfg) -> std::optional<std::vector<BallDetectResult>> {
+        auto proc_frame = cv::Mat();
+        preproc(input, proc_frame, cfg.get_ball_range(), cfg);
+
         std::vector<std::vector<cv::Point>> contour_points = {};
-        cv::findContours(input, contour_points,
+        cv::findContours(proc_frame, contour_points,
             cv::RETR_EXTERNAL,
             cv::CHAIN_APPROX_NONE
         );
@@ -61,30 +79,60 @@ namespace ball_tracker {
 
         if (detected_blobs.empty()) return std::nullopt;
 
-        auto result = std::vector<DetectResult>(detected_blobs.size());
+        auto result = std::vector<BallDetectResult>(detected_blobs.size());
         for (std::size_t i = 0u; i < detected_blobs.size(); ++i) {
             const auto& blob = detected_blobs[i];
             auto center_pos = cv::Point2f();
             auto radius = 0.f;
-            cv::minEnclosingCircle(blob.points, center_pos, radius);
             
+            cv::minEnclosingCircle(blob.points, center_pos, radius);
+
             result[i].x = center_pos.x;
             result[i].y = center_pos.y;
             result[i].r = radius;
         }
+        
+
 
         return result;
     }
 
-    auto proc_frame(const cv::Mat raw_frame, const Config& proc_cfg) -> std::optional<std::vector<DetectResult>> {
+    auto detect_background(const cv::Mat input, const Config& cfg) -> std::optional<BgDetectResult> {
+        auto proc_frame = cv::Mat();
+        preproc(input, proc_frame, cfg.get_bg_range(), cfg);
+
+        std::vector<std::vector<cv::Point>> contour_points = {};
+        cv::findContours(proc_frame, contour_points,
+            cv::RETR_EXTERNAL,
+            cv::CHAIN_APPROX_NONE
+        );
+
+        if (contour_points.empty()) return std::nullopt;
+
+        auto center_pos = cv::Point2f();
+        auto radius = 0.f;
+        
+        auto lagrest = std::max_element(contour_points.begin(), contour_points.end(),
+            [](const auto& a, const auto& b) {
+                return cv::contourArea(a) < cv::contourArea(b);
+            }
+        );
+
+        cv::minEnclosingCircle(*lagrest, center_pos, radius);
+        
+        auto result = BgDetectResult {
+            .x = center_pos.x,
+            .y = center_pos.y,
+            .r = radius
+        };
+
+        return result;
+    }
+
+    auto proc_frame(const cv::Mat raw_frame, const Config& proc_cfg) -> std::optional<std::vector<BallDetectResult>> {
         auto proc_frame = cv::Mat();
         cv::cvtColor(raw_frame, proc_frame, cv::COLOR_BGR2HSV);
 
-        auto binary = cv::Mat();
-        ball_tracker::binary(proc_frame, binary, proc_cfg);
-        auto cleaned = cv::Mat();
-        ball_tracker::clean(binary, cleaned, proc_cfg);
-
-        return ball_tracker::detect_balls(cleaned, proc_cfg);
+        return ball_tracker::detect_balls(proc_frame, proc_cfg);
     }
 }

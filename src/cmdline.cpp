@@ -4,7 +4,7 @@
 
 namespace ball_tracker {
     static constexpr const char* opt_keys = 
-        "{ help    | false       | 使用帮助   }"
+        "{ help    |             | 使用帮助   }"
         "{ source  | /dev/video0 | 图像处理源 }"
         "{ display |  false | 开启图像预览 }";
 

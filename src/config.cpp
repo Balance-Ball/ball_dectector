@@ -17,7 +17,7 @@ namespace {
 }
 
 namespace ball_tracker {
-    auto load_config(std::filesystem::path path) -> Config {
+    auto Config::load_config(std::filesystem::path path) -> Config {
         auto file_reader = std::ifstream(path);
         if (!file_reader.is_open()) {
             throw std::logic_error("Failed to open config file");
