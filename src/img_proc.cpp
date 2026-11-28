@@ -1,5 +1,7 @@
 #include "img_proc.hpp"
 #include "config.hpp"
+#include <cstdio>
+#include <iostream>
 #include <opencv2/core/hal/interface.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
@@ -90,6 +92,12 @@ namespace ball_tracker {
             result[i].x = center_pos.x;
             result[i].y = center_pos.y;
             result[i].r = radius;
+
+            std::printf("Detected ball: cx = %f, cy = %f, radius = %f\n",
+                center_pos.x,
+                center_pos.y,
+                radius
+            );
         }
         
 

@@ -35,9 +35,10 @@ auto main(int argc, char* argv[]) -> int {
         cv::resize(frame, frame, cv::Size(proc_cfg.resolution[0], proc_cfg.resolution[1]));
 
         auto display = frame.clone();
+        cv::cvtColor(frame, frame, cv::COLOR_BGR2HSV);
 
-        decltype(ball_tracker::detect_balls(frame, proc_cfg)) balls;
-        decltype(ball_tracker::detect_background(frame, proc_cfg)) background;
+        auto balls = decltype(ball_tracker::detect_balls(frame, proc_cfg))();
+        auto background = decltype(ball_tracker::detect_background(frame, proc_cfg))();
 
         auto workers = std::vector<std::thread>();
         workers.emplace_back(std::thread([frame, proc_cfg, &balls] {
